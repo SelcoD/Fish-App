@@ -1,13 +1,15 @@
-import { products } from "../../../lib/products";
+import dbConnect from "../../../db/connect.js";
+import Product from "../../../db/models/Product.js";
 
-export default function handler(request, response) {
+export default async function handler(request, response) {
   const { id } = request.query;
+  await dbConnect();
 
-  const product = products.find((product) => product.id === id);
+  if (request.method === "GET") {
+    const product = await Product.findById(id);
 
-  if (!product) {
-    return response.status(404).json({ status: "Not Found" });
+    return response.status(200).json(product);
+  } else {
+    return response.status(405).json({ message: "Method not alowed" });
   }
-
-  response.status(200).json(product);
 }
